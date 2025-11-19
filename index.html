@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Linguist</title>
+    <style>
+        /* Main container to hold the image and frame */
+        .crop-container {
+            position: relative;
+            display: block;
+            overflow: hidden;
+            user-select: none;
+            margin: auto;
+        }
+
+        /* Make the image responsive and prevent default drag */
+        .crop-container img {
+            display: block;
+            max-width: 100%;
+            pointer-events: none; /* Prevents browser's native image drag */
+        }
+
+        .crop-container video {
+            display: block;
+            max-width: 100%;
+        }
+
+        /* The cropping frame overlay */
+        #cropFrame {
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            width: 150px;
+            height: 150px;
+            border: 2px dashed #ffffff;
+            box-sizing: border-box;
+            cursor: move;
+            /* Dim the area outside the frame */
+            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.3);
+        }
+
+        /* --- New Handle CSS --- */
+        /* Common style for all resize handles */
+        .resize-handle {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #ffffff;
+            border: 1px solid #333;
+            z-index: 10;
+        }
+
+        /* Position each handle */
+        .resize-handle[data-direction="nw"] {
+            top: -5px;
+            left: -5px;
+            cursor: nwse-resize;
+        }
+        .resize-handle[data-direction="ne"] {
+            top: -5px;
+            right: -5px;
+            cursor: nesw-resize;
+        }
+        .resize-handle[data-direction="sw"] {
+            bottom: -5px;
+            left: -5px;
+            cursor: nesw-resize;
+        }
+        .resize-handle[data-direction="se"] {
+            bottom: -5px;
+            right: -5px;
+            cursor: nwse-resize;
+        }
+
+
+        /* controls below the video */
+        .controls {
+        display: flex;
+        gap: 12px;
+        margin-top: 12px;
+        justify-content: center;
+        }
+
+        .button {
+        padding: 8px 14px;
+        border: 1px solid #bbb;
+        background: #eee;
+        cursor: pointer;
+        border-radius: 6px;
+        font-size: 14px;
+        }
+        .button:active { transform: translateY(1px); }
+
+        #startButton {
+          background: #5ba6f5;
+        }
+
+    </style>
+</head>
+<body>
+    <h2>Super Linguist</h2>
+    <p id="info"></p>
+
+    <div class="crop-container">
+        <video id="screenCapture" autoplay></video>
+        
+        <div id="cropFrame">
+            <div class="resize-handle" data-direction="nw"></div>
+            <div class="resize-handle" data-direction="ne"></div>
+            <div class="resize-handle" data-direction="sw"></div>
+            <div class="resize-handle" data-direction="se"></div>
+        </div>
+    </div>
+
+    <div class="controls">
+      <button id="selectButton" class="button">Select</button>
+      <button id="stopButton" class="button">Stop</button>
+      <button id="confirmButton" class="button">Start</button>
+    </div>
+
+    <div id="textBox"></div>
+
+    <script src="renderer.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,34 @@
+{
+  "name": "superlinguist",
+  "version": "1.0.0",
+  "description": "Language Learning",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron .",
+    "dist": "electron-builder"
+  },
+  "build": {
+    "appId": "com.jason44.SuperLinguist",
+    "productName": "Super Linguist",
+    "mac": {
+      "category": "public.app-category.education",
+      "icon": "assets/appicon.png"
+    },
+    "win": {
+      "icon": "assets/appicon.png"
+    },
+    "linux": {
+      "icon": "assets/appicon.png"
+    }
+  },
+  "postinstall": "electron-builder install-app-deps",
+  "keywords": [
+    "education"
+  ],
+  "author": "jason44",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^39.2.0"
+  }
+}
