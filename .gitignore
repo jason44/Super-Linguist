@@ -1,3 +1,5 @@
 node_modules
 kill5000.sh
 Notes.md
+output
+*.DS_Store

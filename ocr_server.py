@@ -6,13 +6,14 @@ import matplotlib.pyplot as plt
 #from PIL import Image, ImageTk
 #import tkinter as tk
 from paddleocr import PaddleOCR
+import utils.language_processor as lang
 
 ocr = PaddleOCR(
     use_doc_orientation_classify=False,
     use_doc_unwarping=False,
     use_textline_orientation=False,
     #lang="en",
-    ocr_version="PP-OCRv5",
+    ocr_version="PP-OCRv4",
     device="gpu",
 )
 
@@ -37,6 +38,7 @@ def start_ocr_server(host="127.0.0.1", port=5000):
     print(f"Server listening on {host}:{port}")
     
     while True:
+        conn = None
         try:
             conn, addr = server.accept()
             print("Client connected:", addr)
@@ -55,32 +57,27 @@ def start_ocr_server(host="127.0.0.1", port=5000):
                 #plt.show()
 
                 # --- Send OCR results to client ---
-                result = ocr.predict(frame)
-                texts = []
-                scores = []
-                character_boxes = []
-                print(result)
+                res = ocr.predict(frame)
+                #print(result)
 
-                for res in result[:1]:
-                    texts.extend(res['rec_texts'])
-                    scores.extend(res['rec_scores'])
-                    character_boxes.extend(res['rec_boxes']) 
+                rec_thres = 0.85
+                res_data = { 'texts': [], 'boxes': [] }
+                for i in range(res[0]['rec_texts']):
+                    if res[0]['rec_scores'][i] > rec_thres:
+                        res_data['texts'].append(res[0]['rec_texts'][i])
+                        res_data['boxes'].append(res[0]['rec_boxes'][i].tolist())
+                 
+                res_data = lang.group_lines(res_data)
+                res_data['texts'] = [lang.split_to_word_with_pos(p) for p in res_data['texts']]
 
-                return_data = {
-                    'texts': texts, 
-                    'scores': scores,
-                    'character_level_boxes': [box.tolist() for box in character_boxes]
-                }
-                conn.send(json.dumps(return_data).encode('utf-8'))
-                
-                    
+                conn.send(json.dumps(res_data).encode('utf-8'))
         except ConnectionError:
             print("Client disconnected, waiting for reconnection...")
             conn.close()
         except KeyboardInterrupt:
-            conn.close()
+            if conn: conn.close()
             server.close()
-            print("Server Shutdown.")
+            print("Server Shutdown Successfully.")
             break
 
 

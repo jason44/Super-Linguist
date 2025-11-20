@@ -73,22 +73,21 @@
             cursor: nwse-resize;
         }
 
-
         /* controls below the video */
         .controls {
-        display: flex;
-        gap: 12px;
-        margin-top: 12px;
-        justify-content: center;
+            display: flex;
+            gap: 12px;
+            margin-top: 12px;
+            justify-content: center;
         }
 
         .button {
-        padding: 8px 14px;
-        border: 1px solid #bbb;
-        background: #eee;
-        cursor: pointer;
-        border-radius: 6px;
-        font-size: 14px;
+            padding: 8px 14px;
+            border: 1px solid #bbb;
+            background: #eee;
+            cursor: pointer;
+            border-radius: 6px;
+            font-size: 14px;
         }
         .button:active { transform: translateY(1px); }
 
@@ -116,12 +115,12 @@
     <div class="controls">
       <button id="selectButton" class="button">Select</button>
       <button id="stopButton" class="button">Stop</button>
-      <button id="confirmButton" class="button">Start</button>
+      <button id="startButton" class="button">Start</button>
     </div>
 
     <div id="textBox"></div>
 
-    <script src="renderer.js"></script>
+    <script type="module" src="renderer.js"></script>
 
 </body>
 </html>

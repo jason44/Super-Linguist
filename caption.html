@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Draggable Window</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* reserve space for the fixed header so content isn't hidden under it */
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background-color: #f0f0f0;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    .header {
+      /* 25px height */
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 12px;
+      background-color: #2d2d2d;
+      color: white;
+      padding: 12px 6px;
+      display: flex;
+      justify-content: flex-end;
+      /* buttons at top-right */
+      align-items: center;
+      cursor: move;
+      user-select: none;
+      app-region: drag;
+      border-bottom: 1px solid #585858;
+      z-index: 1000;
+    }
+
+    .header-buttons {
+      display: flex;
+      gap: 4px;
+    }
+
+    button {
+      background: none;
+      border: none;
+      color: #dddddd;
+      cursor: pointer;
+      padding: 0px 6px;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.2s;
+      app-region: no-drag;
+      /* keep buttons clickable in draggable region */
+    }
+
+    button:hover {
+      color: white;
+    }
+
+    .content {
+      display: block;
+      background-color: #212121;
+      width: 100vw;
+      height: calc(100vh - 25px);
+      margin-top: 25px;
+    }
+
+    .word {
+      color: white;
+      font-size: 25px; 
+      line-height: 25px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="header">
+    <div class="header-buttons">
+      <button id="settingsBtn" title="Settings">⚙️</button>
+      <button id="closeBtn" title="Close">✕</button>
+    </div>
+  </div>
+  <div id='content' class="content">
+    <div class="word">别当</div>
+  </div>
+  <script type="module" src="captionRenderer.js">
+
+  </script>
+</body>
+
+</html>
