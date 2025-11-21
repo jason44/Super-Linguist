@@ -1,15 +1,46 @@
-import spacy_pkuseg
 from simhash import Simhash
+import pypinyin
+import jieba
+import hanlp
 
-seg = spacy_pkuseg.pkuseg()
-seg_pos = spacy_pkuseg.pkuseg(postag=True)
+
+# --- Text-segmentation based on on two different approaches
+# Jieba uses a dictionary-based model which is faster but less accurate at segmenting.
+# Hanlp uses a more accurate but slower transformer model.
+# Pkuseg is inbetween the two in accuracy-speed tradeoff
+def split_to_words_fast(p):
+    try:
+        return jieba.cut(p)
+    except Exception as e:
+        print(f"An error occurred during text segmentation: {e}")
+        return []
+
+try:
+    print("Loading HanLP Multi-Task Learning Model for CWS and POS...")
+    # ELECTRA model is much faster than the BERT model
+    tagger = hanlp.load(hanlp.pretrained.mtl.CLOSE_TOK_POS_NER_SRL_DEP_SDP_CON_ELECTRA_SMALL_ZH, device=0)
+    print("Model loaded successfully.")
+except Exception as e:
+    print(f"Error loading HanLP model: {e}")
+
+def split_to_words(p, tasks=['tok/fine', 'pos/ctb']):
+    try:
+        result = tagger(p, tasks)
+        return list(zip(result['tok/fine'], result['pos/ctb']))
+    except Exception as e:
+        print(f"An error occurred during text segmentation: {e}")
+        return []
+    
+def batch_split_to_words(ps, tasks=['tok/fine', 'pos/ctb']):
+    try:
+        results = tagger(ps, tasks=tasks)
+        return [list(zip(tokens, tags)) for tokens, tags in zip(results['tok/fine'], results['pos/ctb'])]
+    except Exception as e:
+        print(f"An error occurred during text segmentation: {e}")
+        return []
 
 
-def split_to_words(p):
-    return seg.cut(p)
-
-def split_to_words_with_pos(p):
-    return seg_pos.cut(p)
+# --- Line grouping: Combining lines that are likely to be part of the same thought/sentence
 
 # 1. Heuristic: punctuation-based continuation score
 def punctuation_score(line):
@@ -39,7 +70,7 @@ def word_split_score(line1, line2):
 
     # take last 3 chars of L1 and first 3 of L2
     window = line1[-3:] + line2[:3]
-    words = list(seg.cut(window))
+    words = list(split_to_words_fast(window))
 
     # if a long word spans the boundary, we count that
     score = 0.0

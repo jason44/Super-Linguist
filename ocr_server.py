@@ -17,6 +17,12 @@ ocr = PaddleOCR(
     device="gpu",
 )
 
+prev_ocr_key = ""
+def is_same_frame(ocr_key):
+    if ocr_key == prev_ocr_key: return True
+    return False
+
+
 def recv_exact(sock, size):
     """Receive exactly 'size' bytes."""
     buf = b''
@@ -61,16 +67,22 @@ def start_ocr_server(host="127.0.0.1", port=5000):
                 #print(result)
 
                 rec_thres = 0.85
-                res_data = { 'texts': [], 'boxes': [] }
+                data = { 'texts': [], 'boxes': [] }
                 for i in range(res[0]['rec_texts']):
                     if res[0]['rec_scores'][i] > rec_thres:
-                        res_data['texts'].append(res[0]['rec_texts'][i])
-                        res_data['boxes'].append(res[0]['rec_boxes'][i].tolist())
-                 
-                res_data = lang.group_lines(res_data)
-                res_data['texts'] = [lang.split_to_word_with_pos(p) for p in res_data['texts']]
+                        data['texts'].append(res[0]['rec_texts'][i])
+                        data['boxes'].append(res[0]['rec_boxes'][i].tolist())
 
-                conn.send(json.dumps(res_data).encode('utf-8'))
+                # Do not update if the ocr results do not change 
+                cur_ocr_key = "".join(data['texts']).strip()
+                if is_same_frame(): continue
+                prev_ocr_key = cur_ocr_key
+
+                # Group lines and split into words
+                data = lang.group_lines(data)
+                data['texts'] = lang.batch_split_to_words(data['texts'])
+
+                conn.send(json.dumps(data).encode('utf-8'))
         except ConnectionError:
             print("Client disconnected, waiting for reconnection...")
             conn.close()

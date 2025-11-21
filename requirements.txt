@@ -1,0 +1,9 @@
+jieba
+hanlp
+pypinyin
+paddlepaddle
+#paddlepaddle-gpu
+paddleocr
+sqlite3
+simhash
+

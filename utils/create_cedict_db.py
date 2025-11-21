@@ -147,21 +147,5 @@ class CEDICTParser:
 if __name__ == "__main__":
     parser = CEDICTParser()
 
-    if parser.parse_file("asset/cedict/cedict_ts.u8"):
-        parser.save_json("cedict.json")
-
-
-
-        # Inline classifiers can appear in a variety of ways. 
-        # It is best to handle these on the javascript side when we split the defs by the semi-colons
-        # the classifiers apply to everything in
-        # /living being; creature (CL:個|个[ge4],條|条[tiao2]/
-        # /application form (CL:份[fen4])/
-        # /joke; jest (CL:個|个[ge4]/[some verb]  noun->CL->verbs
-
-        # For separated classifiers, the classifiers only apply to the definitions that come before it.
-        # the words after are usually not nouns (or nouns which the classifier do not apply to?)
-        # /level/grade/rank/step (of stairs)/CL:個|个[ge4]/classifier: step, level/
-        # /the end/end point/finishing line (in a race)/destination/terminus/CL:個|个[ge4]/
-        # /conclusion/verdict/CL:個|个[ge4]/to conclude/to reach a verdict/  noun->CL->verbs
-        # 
+    if parser.parse_file("assets/cedict/cedict_ts.u8"):
+        parser.save_json("assets/cedict/cedict.json")
