@@ -22,7 +22,7 @@ ocr = PaddleOCR(
 # ) # 更换 PP-OCRv5_server 模型
 
 
-result = ocr.predict("./assets/screenshot_5.png")
+result = ocr.predict("./assets/images/screenshot_5.png")
 for res in result:
     res.print()
     res.save_to_img("output")

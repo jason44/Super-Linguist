@@ -7,7 +7,7 @@ ocr = PaddleOCR(use_angle_cls=True)
 
 # Load an image using OpenCV, which returns a NumPy array
 # Replace 'path/to/your/image.jpg' with the actual path to your image
-img_path = 'assets/screenshot_1.jpeg' 
+img_path = 'assets/images/screenshot_1.jpeg'
 img_np_array = cv2.imread(img_path)
 print(img_np_array.shape)
 

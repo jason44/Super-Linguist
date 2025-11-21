@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Fixed Floating Pane Example</title>
+<style>
+  :root{
+    --pane-width: 360px;
+    --pane-height: auto;
+    --pane-padding: 18px;
+    --pane-bg: #ffffff;
+    --pane-radius: 12px;
+    --pane-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    --overlay-bg: rgba(0,0,0,0.35);
+    --z-top: 9999; /* adjust if needed */
+  }
+
+  body{
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    margin: 0;
+    min-height: 100vh;
+  }
+
+  /* Example page content so you can see the pane floating above siblings */
+  .page {
+    padding: 48px;
+  }
+  .card {
+    background: #f6f7fb;
+    padding: 20px;
+    border-radius: 8px;
+    margin: 12px 0;
+  }
+
+  /* Overlay that sits beneath the pane but above other content */
+  .overlay {
+    position: fixed;
+    inset: 0;                /* top:0; right:0; bottom:0; left:0 */
+    z-index: calc(var(--z-top) - 1);
+    background: var(--overlay-bg);
+    display: none;           /* shown when pane open */
+    backdrop-filter: blur(2px);
+  }
+  .overlay.visible {
+    display: block;
+  }
+
+  /* The floating pane itself */
+  .floating-pane {
+    position: fixed;         /* fixed relative to viewport */
+    /* Example anchor: bottom-right. Change top/left/right/bottom to reposition. */
+    right: 24px;
+    bottom: 24px;
+
+    width: var(--pane-width);
+    max-width: calc(100% - 48px);
+    height: var(--pane-height);
+
+    padding: var(--pane-padding);
+    background: var(--pane-bg);
+    border-radius: var(--pane-radius);
+    box-shadow: var(--pane-shadow);
+
+    z-index: var(--z-top);
+    display: none;           /* hidden by default */
+  }
+
+  /* visible state */
+  .floating-pane.visible {
+    display: block;
+    animation: slideUp 200ms ease-out;
+  }
+
+  @keyframes slideUp {
+    from { transform: translateY(12px); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+  }
+
+  /* small header row inside pane */
+  .pane-header {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom: 8px;
+  }
+  .pane-title {
+    font-weight:600;
+    font-size: 1rem;
+  }
+  .close-btn {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 6px;
+  }
+  .close-btn:focus {
+    outline: 2px solid Highlight;
+    outline-offset: 2px;
+  }
+
+  /* content */
+  .pane-body {
+    font-size: 0.95rem;
+    line-height: 1.4;
+  }
+
+  /* Example variation: centered modal */
+  .floating-pane.centered {
+    left: 50%;
+    top: 50%;
+    right: auto;
+    bottom: auto;
+    transform: translate(-50%, -50%);
+    width: clamp(300px, 46vw, 720px);
+  }
+
+  /* Ensure the pane is on top of sticky/fixed siblings: use very large z-index if needed */
+</style>
+</head>
+<body>
+
+<div class="page">
+  <h1>Page content</h1>
+  <p>Scrollable content, sibling elements, etc. The floating pane will stay fixed above them.</p>
+
+  <div class="card">Sibling element 1</div>
+  <div class="card">Sibling element 2</div>
+
+  <button id="openBottomRight">Open bottom-right pane</button>
+  <button id="openCentered">Open centered pane</button>
+</div>
+
+<!-- overlay (optional) -->
+<div id="overlay" class="overlay" tabindex="-1" aria-hidden="true"></div>
+
+<!-- floating pane (bottom-right by default) -->
+<aside id="pane" class="floating-pane" role="dialog" aria-modal="true" aria-labelledby="paneTitle" aria-hidden="true">
+  <div class="pane-header">
+    <div id="paneTitle" class="pane-title">Floating Pane</div>
+    <button id="closeBtn" class="close-btn" aria-label="Close pane">&times;</button>
+  </div>
+  <div class="pane-body">
+    <p>This pane is fixed to the viewport and sits above its siblings. You can reposition it by editing the CSS (top/right/left/bottom) or add the <code>.centered</code> class to center it.</p>
+    <p>Press <kbd>Esc</kbd> to close.</p>
+  </div>
+</aside>
+
+<script>
+  (function(){
+    const pane = document.getElementById('pane');
+    const overlay = document.getElementById('overlay');
+    const openBR = document.getElementById('openBottomRight');
+    const openCenter = document.getElementById('openCentered');
+    const closeBtn = document.getElementById('closeBtn');
+
+    let lastFocused = null;
+
+    function openPane(options = {}) {
+      if (options.centered) {
+        pane.classList.add('centered');
+      } else {
+        pane.classList.remove('centered');
+      }
+
+      lastFocused = document.activeElement;
+      pane.classList.add('visible');
+      pane.setAttribute('aria-hidden', 'false');
+
+      if (overlay) {
+        overlay.classList.add('visible');
+        overlay.setAttribute('aria-hidden', 'false');
+      }
+
+      // Put focus inside pane for accessibility
+      closeBtn.focus();
+
+      // prevent page scroll behind when overlay shown
+      if (overlay) document.documentElement.style.overflow = 'hidden';
+    }
+
+    function closePane() {
+      pane.classList.remove('visible');
+      pane.setAttribute('aria-hidden', 'true');
+
+      if (overlay) {
+        overlay.classList.remove('visible');
+        overlay.setAttribute('aria-hidden', 'true');
+      }
+
+      if (lastFocused && typeof lastFocused.focus === 'function') {
+        lastFocused.focus();
+      }
+      document.documentElement.style.overflow = '';
+    }
+
+    openBR.addEventListener('click', ()=> openPane({centered:false}));
+    openCenter.addEventListener('click', ()=> openPane({centered:true}));
+    closeBtn.addEventListener('click', closePane);
+    overlay.addEventListener('click', closePane);
+
+    // Close on Escape
+    window.addEventListener('keydown', (ev)=>{
+      if (ev.key === 'Escape' && pane.classList.contains('visible')) {
+        ev.preventDefault();
+        closePane();
+      }
+    });
+
+    // Optional: close if resized to very small widths (example)
+    window.addEventListener('resize', ()=>{
+      // keep pane visible; adapt with CSS clamp / max-width; nothing required here
+    });
+  })();
+</script>
+</body>
+</html>

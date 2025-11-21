@@ -1,0 +1,41 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Trivia Game</title>
+    <link rel="stylesheet" href="styles.css">
+    <body>
+        <div class="body-outline">
+            <div id="main-mission-button" class="container-button round-button" style="width:100pt; height:100pt"></div>
+        </div>
+    </body>
+
+    <!-- Backdrop -->
+    <div id="backdrop" class="backdrop" tabindex="-1" aria-hidden="true"></div>
+
+    <!-- Panel: use role="dialog" and aria-modal for accessibility -->
+    <aside id="panel" class="panel" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="panelTitle">
+        <div class="panel-header">
+        <div id="panelTitle" class="panel-title">Slide-in Pane</div>
+        <button id="closePanel" class="close-btn" aria-label="Close panel">&times;</button>
+        </div>
+        <div class="panel-body">
+        <p>This is a sliding pane that appears from the right. It supports keyboard navigation and closes when you press <kbd>Esc</kbd>, click the backdrop, or click the close button.</p>
+
+        <p>
+            Example focusable items:
+        </p>
+        <input placeholder="Type something" style="width:100%;padding:8px;margin-bottom:10px;border-radius:6px;border:1px solid #ddd;">
+        <a href="#" style="display:inline-block;margin-bottom:10px;">A link inside the pane</a>
+        <button style="display:block;padding:10px 12px;border-radius:6px;">Action</button>
+
+        <p style="margin-top: 18px; color:#555; font-size:0.9rem;">
+            Tip: Resize the window to see the small-screen layout; the pane width uses a CSS variable.
+        </p>
+        </div>
+    </aside>
+
+    <script>
+    </script>
+<head>
+</html>

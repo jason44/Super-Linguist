@@ -1,0 +1,173 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Trivia Game</title>
+    <link rel="stylesheet" href="styles.css">
+    <body>
+        <div class="body-outline">
+
+        <header class="header">
+            <button id="exit-button" class="container-button round-button gradient-border" type="button" aria-label="Search" style="width: 40pt; height: 40pt; margin-left: 12pt;">
+                <img src="assets/icons/arrow-back.svg" class="symbolic-icon" style="width:25pt; height:25pt">
+            </button>
+            <div class="progress-bar-container">
+                <span class="progress-number-indicator" id="passed" style="top: -10pt; left:-18pt;">16</span>
+                <span class="progress-number-indicator" style="top:-6pt; left:6pt; transform:rotate(18deg);">/</span>
+                <span class="progress-number-indicator" id="number-of-questions" style="top:0pt; left:12pt;">20</span>
+                <span class="progress-bar"></span>
+            </div>
+            <button id="assistant-button" class="container-button round-button gradient-border" type="button" aria-label="Search" style="width: 40pt; height: 40pt; margin-right: 12pt;">
+                <img src="assets/icons/robot.svg" class="symbolic-icon" style="width:25pt; height:25pt">
+            </button>
+        </header>
+
+            <div class="problem-container gradient-border">
+                <span class="container-contents">Question</span>
+            </div>     
+            <div class="option-grid">
+                <div class="option-box gradient-border ripple-button" id="option-1">
+                    <span class="ripple-fill-layer"></span>
+                    <span class="container-contents">Box</span> 
+                </div>
+                <div class="option-box gradient-border ripple-button" id="option-2">
+                    <span class="ripple-fill-layer"></span>
+                    <span class="container-contents">Box</span> 
+                </div>
+                <div class="option-box gradient-border ripple-button" id="option-3">
+                    <span class="ripple-fill-layer"></span>
+                    <span class="container-contents">Box</span> 
+                </div>
+                <div class="option-box gradient-border ripple-button" id="option-4">
+                    <span class="ripple-fill-layer"></span>
+                    <span class="container-contents">Box</span> 
+                </div>
+            </div>
+            <footer class="footer">
+                <button id="submit-button" class="container-button gradient-border ripple-button" style="width: 90pt; height: 60pt; margin-left: auto; margin-right: 12pt;">
+                    <span class="ripple-fill-layer"></span>
+                    <span class="container-contents">
+                        <img src="assets/icons/keyboard-return.svg" class="symbolic-icon" style="width:35pt; height:35pt">
+                    </span>
+                </button>
+            </footer>
+
+        </div> 
+
+        <script>
+            /* Gradient Border */
+            window.addEventListener('mousemove', (e) => {
+                const centerX = window.innerWidth / 2;
+                const centerY = window.innerHeight / 2;
+                
+                // Calculate the angle between the mouse and the window center
+                const x = e.clientX - centerX;
+                const y = e.clientY - centerY;
+                let angle = Math.atan2(y, x) * (180 / Math.PI);
+
+                if (angle < 0) angle += 360;
+
+                // Round to nearest multiple of 10 degrees
+                const snappedAngle = Math.round(angle / 10) * 10;
+                
+                document.querySelectorAll('.gradient-border').forEach(el => {
+                    el.style.setProperty('--angle', `${snappedAngle}deg`);
+                });
+            });
+
+            
+            /* Options box */
+            const options = [1,2,3,4].map((k) => {
+                return document.getElementById(`option-${k}`);
+            });
+            let active = null; /* the option that will be chosen when the submit button is pressed */
+
+            document.querySelectorAll('.option-box').forEach(el => {
+                const fill = el.querySelectorAll('.ripple-fill-layer')[0];
+                const contents = el.querySelectorAll('.container-contents')[0];
+                const boxShadow = el.style.boxShadow;
+                const root = document.documentElement;
+                const activeOptionGlow = window.getComputedStyle(root).getPropertyValue('--active-option-glow');
+                const activeOptionBorder = window.getComputedStyle(root).getPropertyValue('--active-option-border');
+
+                let isMouseOver = false;
+
+                el.addEventListener('mouseup', (e) => {
+                    if (isMouseOver) {
+                        active = el;
+                        contents.style.fontWeight = 'bold';
+                        el.style.transform = 'none';
+                        el.classList.add("active-option");
+                        console.log('option is now ACTIVE');
+                    }
+                    options.forEach(option => {
+                        if (option !== active) {
+                            const optionFill = option.querySelectorAll('.ripple-fill-layer')[0];
+                            const optionContents = option.querySelectorAll('.container-contents')[0];
+
+                            option.classList.remove("active-option");
+                            optionFill.style.transition = 'transform .1s ease-in';
+                            optionFill.style.transform = 'scaleX(0.0)';
+                            optionContents.style.fontWeight = 'normal';
+                            option.style.transform = 'none';
+
+                            option.style.boxShadow = boxShadow;
+                            option.style.border = 'none';
+                        }
+                    })
+                });
+
+                el.addEventListener('mouseenter', () => {
+                    isMouseOver = true;
+                    if (el != active) { // hover behavior for non-active options
+                        el.style.boxShadow = activeOptionGlow;
+                        el.style.border = activeOptionBorder;
+                    }
+                })
+
+                el.addEventListener('mouseleave', () => {
+                    isMouseOver = false;
+                });
+            });
+            
+            /* ripple button behavior */
+            document.querySelectorAll('.ripple-button').forEach(el => {
+                const fill = el.querySelectorAll('.ripple-fill-layer')[0];
+                const contents = el.querySelectorAll('.container-contents')[0];
+                const boxShadow = el.style.boxShadow;
+
+                el.addEventListener('mousedown', e => {
+                    const rect = el.getBoundingClientRect();
+                    const clickX = e.clientX - rect.left;
+                    const ratio = Math.max(0, Math.min(1, clickX / rect.width));
+                    fill.style.transformOrigin = `${ratio * 100}% 50%`;
+                    fill.style.transition = 'none';
+                    fill.style.transform = 'scaleX(0.25)';
+                    fill.offsetHeight;
+                    fill.style.transition = 'transform .15s ease-out';
+                    fill.style.transform = 'scaleX(1)';
+                    el.style.transform = 'scaleX(1.1) scaleY(1.1) translateY(-4pt)';
+                })
+
+                el.addEventListener('mouseup', e => {
+                    el.style.transform = 'none';
+                })
+
+                el.addEventListener('mouseleave', () => {
+                    if (el !== active) {
+                        fill.style.transition = 'transform .1s ease-in';
+                        fill.style.transform = 'scaleX(0.25)';
+                        fill.style.transition = 'none';
+                        fill.style.transform = 'scaleX(0.0)';
+                        contents.style.fontWeight = 'normal';
+                        el.style.boxShadow = boxShadow;
+                        el.style.border = 'none';
+                    }
+                    el.style.transform = 'none';
+                })
+                
+            })            
+        </script>
+    </body> 
+<head>
+</html>
